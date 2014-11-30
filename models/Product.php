@@ -124,7 +124,7 @@ class Product extends \yii\db\ActiveRecord
         if(Yii::$app->request->get('id')){
             self::$_product = self::findOne(Yii::$app->request->get('id'));
         }
-        elseif(Yii::$app->request->post('User')){
+        elseif(Yii::$app->request->post('Product')){
             self::$_product = new self(Yii::$app->request->post('Product'));
         }
         else{

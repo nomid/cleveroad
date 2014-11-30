@@ -56,7 +56,7 @@ class UserController extends SiteController
                 ->setSubject('Activate account')
                 ->send();
             Yii::$app->session->setFlash('success', 'Activation link sent to your email: '.$user->email);
-            return $this->goBack();
+            return $this->goHome();
         }
         return ['view' => 'new'];
     }
