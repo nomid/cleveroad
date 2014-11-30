@@ -707,15 +707,253 @@ test("decimal alias set value with val() - kochelmonster", function () {
     $("#testmask").remove();
 });
 
-test("inputmask(\"decimal\") - value=\"123.1\" tab out", function () {
+test("inputmask(\"decimal\") - value=\"123.1\" blur digitsoptional", function () {
     var $fixture = $("#qunit-fixture");
     $fixture.append('<input type="text" id="testmask" />');
     $("#testmask").inputmask("decimal", { digits: 3 });
 
     $("#testmask")[0].focus();
     $("#testmask").Type("123.1");
-    $("#testmask").SendKey($.inputmask.keyCode.TAB);
+    $("#testmask").blur();
+
+    equal($("#testmask").val(), "123.1", "Result " + $("#testmask").val());
+    $("#testmask").remove();
+});
+
+test("inputmask(\"decimal\") - value=\"123.1\" blur", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask("decimal", { digits: 3, digitsOptional: false });
+
+    $("#testmask")[0].focus();
+    $("#testmask").Type("123.1");
+    $("#testmask").blur();
 
     equal($("#testmask").val(), "123.100", "Result " + $("#testmask").val());
+    $("#testmask").remove();
+});
+
+asyncTest("currency alias - 200000 => replace 2 to 3", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask("currency");
+
+    $("#testmask")[0].focus();
+    $("#testmask").click();
+    setTimeout(function () {
+        $("#testmask").Type("200000");
+        $.caret($("#testmask"), 2, 3);
+        $("#testmask").Type("3");
+        start();
+        equal($("#testmask").val(), "$ 300,000.00", "Result " + $("#testmask").val());
+        $("#testmask").remove();
+    }, 5);
+});
+
+test("inputmask(\"integer\") - -0 - laxmikantG", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask("integer", { placeholder: "0" });
+
+    $("#testmask")[0].focus();
+    $("#testmask").Type("-0");
+    $("#testmask").blur();
+    equal($("#testmask").val(), "", "Result " + $("#testmask").val());
+    $("#testmask").remove();
+});
+
+test("inputmask(\"integer\") - 123- - laxmikantG", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask("integer", { placeholder: "0" });
+
+    $("#testmask")[0].focus();
+    $("#testmask").Type("123-");
+
+    equal($("#testmask").val(), "-123", "Result " + $("#testmask").val());
+    $("#testmask").remove();
+});
+
+test("inputmask(\"decimal\") - val(\"-5000,77\"); - ManRueda", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask('decimal', {
+        integerDigits: 10,
+        groupSeparator: '.',
+        autoGroup: true,
+        digits: 2,
+        radixPoint: ',',
+        groupSize: 3
+    });
+
+    $("#testmask").val("-5000,77");
+
+    equal($("#testmask").val(), "-5.000,77", "Result " + $("#testmask").val());
+    $("#testmask").remove();
+});
+
+test("inputmask(\"decimal\") - -0 - ManRueda", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask('decimal', {
+        integerDigits: 10,
+        groupSeparator: '.',
+        autoGroup: true,
+        digits: 2,
+        radixPoint: ',',
+        groupSize: 3
+    });
+
+    $("#testmask").val("-0");
+    $("#testmask").blur();
+
+    equal($("#testmask").val(), "0", "Result " + $("#testmask").val());
+    $("#testmask").remove();
+});
+
+test("inputmask(\"integer\") - -5.000,77 - DrSammyD", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask('integer', { placeholder: "0" });
+
+    $("#testmask").val("-5.000,77");
+    $("#testmask").blur();
+
+    equal($("#testmask").val(), "-5000", "Result " + $("#testmask").val());
+    $("#testmask").remove();
+});
+
+asyncTest("inputmask(\"decimal\ placeholder :\"\" digitsoptional: false) - 123 - loostro", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" value="0,00" />');
+    $("#testmask").inputmask("decimal", {
+        radixPoint: ",",
+        digits: 2,
+        digitsOptional: false,
+        autoGroup: true,
+        groupSeparator: " ",
+        groupSize: 3,
+        allowPlus: false,
+        allowMinus: false,
+    });
+    $("#testmask")[0].focus();
+    $("#testmask").click();
+
+    setTimeout(function() {
+        $("#testmask").Type("123");
+        start();
+        equal($("#testmask").val(), "123,00", "Result " + $("#testmask").val());
+        $("#testmask").remove();
+    }, 0);
+});
+
+asyncTest("inputmask(\"decimal\ placeholder :\"0\" digitsoptional: false) - .12 - YodaJM", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask('decimal', {
+        digits: 2,
+        placeholder: "0",
+        digitsOptional: false
+    });
+    $("#testmask")[0].focus();
+    $.caret($("#testmask"), 0, 4);
+
+    setTimeout(function () {
+        $("#testmask").Type(".12");
+        start();
+        equal($("#testmask").val(), "0.12", "Result " + $("#testmask").val());
+        $("#testmask").remove();
+    }, 0);
+});
+
+test("inputmask(\"decimal\") - '8100000.00' - ManRueda", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask('decimal', {
+        integerDigits: 6,
+        groupSeparator: '.',
+        autoGroup: true,
+        digits: 2,
+        radixPoint: ',',
+        groupSize: 3
+    });
+
+    $("#testmask").val("8100000.00");
+
+    equal($("#testmask").val(), "810.000,00", "Result " + $("#testmask").val());
+    $("#testmask").remove();
+});
+
+test("inputmask(\"decimal\") - '8100000,00' - ManRueda", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask('decimal', {
+        integerDigits: 6,
+        groupSeparator: '.',
+        autoGroup: true,
+        digits: 2,
+        radixPoint: ',',
+        groupSize: 3
+    });
+
+    $("#testmask").val("8100000,00");
+
+    equal($("#testmask").val(), "810.000,00", "Result " + $("#testmask").val());
+    $("#testmask").remove();
+});
+
+test("inputmask(\"decimal\") - 8100000.00 - ManRueda", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask('decimal', {
+        integerDigits: 6,
+        groupSeparator: '.',
+        autoGroup: true,
+        digits: 2,
+        radixPoint: ',',
+        groupSize: 3
+    });
+
+    $("#testmask").val(8100000.00);
+
+    equal($("#testmask").val(), "810.000", "Result " + $("#testmask").val());
+    $("#testmask").remove();
+});
+
+test("inputmask(\"decimal\") - 8100000.00 digitsoptional false - ManRueda", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask('decimal', {
+        integerDigits: 6,
+        groupSeparator: '.',
+        autoGroup: true,
+        digits: 2,
+        digitsOptional: false,
+        radixPoint: ',',
+        groupSize: 3
+    });
+
+    $("#testmask").val(8100000.00);
+    $("#testmask").blur();
+
+    equal($("#testmask").val(), "810.000,00", "Result " + $("#testmask").val());
+    $("#testmask").remove();
+});
+
+test("inputmask(\"decimal\") - 810000.00 - ManRueda", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask('decimal', {
+        integerDigits: 6,
+        groupSeparator: '.',
+        autoGroup: true,
+        digits: 2,
+        radixPoint: ',',
+        groupSize: 3
+    });
+
+    $("#testmask").val('810000.00');
+
+    equal($("#testmask").val(), "810.000,00", "Result " + $("#testmask").val());
     $("#testmask").remove();
 });

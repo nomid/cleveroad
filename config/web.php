@@ -1,12 +1,38 @@
 <?php
-
 $params = require(__DIR__ . '/params.php');
 
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'defaultRoute' => 'product/index',
     'components' => [
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+            'rules' => [
+                'register'      => 'user/new',
+                'GET login'     => 'session/new',
+                'POST login'    => 'session/create',
+                'DELETE logout' => 'session/delete',
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'product',
+                    'extraPatterns' => [
+                        'GET my' => 'my',
+                        'GET <id>/edit' => 'edit',
+                    ],
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'user',
+                    'except' => ['index', 'delete'],
+                    'extraPatterns' => [
+                        'GET <id>/edit' => 'edit'
+                    ],
+                ],
+            ],
+        ],
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '1234',
@@ -23,10 +49,14 @@ $config = [
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
-            // send all mails to a file by default. You have to set
-            // 'useFileTransport' to false and configure a transport
-            // for the mailer to send real emails.
-            'useFileTransport' => true,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.gmail.com',
+                'username' => 'cleveroad.test@gmail.com',
+                'password' => 'cleveroadsmtp',
+                'port' => '465',
+                'encryption' => 'ssl',
+            ],
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -39,6 +69,17 @@ $config = [
         ],
         'db' => require(__DIR__ . '/db.php'),
     ],
+    'modules' => [
+        'yii2images' => [
+            'class' => 'rico\yii2images\Module',
+            //be sure, that permissions ok
+            //if you cant avoid permission errors you have to create "images" folder in web root manually and set 777 permissions
+            'imagesStorePath' => '@webroot/images/store', //path to origin images
+            'imagesCachePath' => '@webroot/images/cache', //path to resized copies
+            'graphicsLibrary' => 'Imagick', //but really its better to use 'Imagick'
+        ],
+    ],
+
     'params' => $params,
 ];
 

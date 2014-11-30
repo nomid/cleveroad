@@ -4,6 +4,8 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+use yii\helpers\BaseUrl;
+use yii\bootstrap\Alert;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -18,37 +20,61 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    <base href="<?= BaseUrl::base(true); ?>">
     <?php $this->head() ?>
 </head>
 <body>
 
+
 <?php $this->beginBody() ?>
     <div class="wrap">
         <?php
+            $user = Yii::$app->user;
             NavBar::begin([
-                'brandLabel' => 'My Company',
+                'brandLabel' => 'Cleveroad',
                 'brandUrl' => Yii::$app->homeUrl,
                 'options' => [
                     'class' => 'navbar-inverse navbar-fixed-top',
                 ],
             ]);
-            echo Nav::widget([
+            $nav = [
                 'options' => ['class' => 'navbar-nav navbar-right'],
                 'items' => [
-                    ['label' => 'Home', 'url' => ['/site/index']],
-                    ['label' => 'About', 'url' => ['/site/about']],
-                    ['label' => 'Contact', 'url' => ['/site/contact']],
-                    Yii::$app->user->isGuest ?
-                        ['label' => 'Login', 'url' => ['/site/login']] :
-                        ['label' => 'Logout (' . Yii::$app->user->identity->username . ')',
-                            'url' => ['/site/logout'],
-                            'linkOptions' => ['data-method' => 'post']],
-                ],
-            ]);
+                    ['label' => 'Home', 'url' => ['/']],
+                ]
+            ];
+            if($user->isGuest){
+                $nav['items'][] = ['label' => 'Login', 'url' => ['/login']];
+                $nav['items'][] = ['label' => 'Register', 'url' => ['/register']];
+            }
+            else{
+                $nav['items'][] = ['label' => 'Logout (' . $user->identity->name . ')',
+                    'url' => ['/logout'],
+                    'linkOptions' => ['data-method' => 'delete']];
+                $nav['items'][] = [
+                    'label' => 'menu',
+                    'items' => [
+                        ['label' => 'Profile', 'url' => '/users/'.$user->id.'/edit'],
+                        ['label' => 'Add product', 'url' => '/product/new'],
+                        ['label' => 'My products', 'url' => '/products/my'],
+                    ]
+                ];
+            }
+            echo Nav::widget($nav);
             NavBar::end();
         ?>
 
         <div class="container">
+            <?php
+            foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+                echo Alert::widget([
+                    'options' => [
+                        'class' => 'alert-'.$key,
+                    ],
+                    'body' => $message,
+                ]);
+            }
+            ?>
             <?= Breadcrumbs::widget([
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
             ]) ?>

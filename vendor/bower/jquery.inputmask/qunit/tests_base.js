@@ -10,14 +10,17 @@ test("inputmask(\"99-99-99\", { clearMaskOnLostFocus: false}", function () {
     $("#testmask").remove();
 });
 
-test("inputmask(\"99-99-99\", { clearMaskOnLostFocus: true}", function () {
+asyncTest("inputmask(\"99-99-99\", { clearMaskOnLostFocus: true}", function () {
     var $fixture = $("#qunit-fixture");
     $fixture.append('<input type="text" id="testmask" />');
     $("#testmask").inputmask("99-99-99", { clearMaskOnLostFocus: true });
     $("#testmask").blur();
-    equal(document.getElementById("testmask").value, "", "Result " + document.getElementById("testmask").value);
+    setTimeout(function () {
+        start();
+        equal(document.getElementById("testmask").value, "", "Result " + document.getElementById("testmask").value);
 
-    $("#testmask").remove();
+        $("#testmask").remove();
+    }, 0);
 });
 
 test("inputmask(\"999.999.999\")", function () {
@@ -414,3 +417,24 @@ test("inputmask({ mask: \"9\", repeat: 10, placeholder: \"\", numericInput: true
     $("#testmask").remove();
 });
 
+asyncTest("creditcard switch - pchelailya", function () {
+    var $fixture = $("#qunit-fixture");
+    $fixture.append('<input type="text" id="testmask" />');
+    $("#testmask").inputmask("9999 9999 9999 9999");
+    $("#testmask").on("keyup", function (event) {
+        var value = $(this).inputmask("unmaskedvalue");
+
+        if (value.length === 2 && value === "37") {
+            $("input").inputmask("9999 999999 99999");
+        }
+    });
+    $("#testmask")[0].focus();
+    $("#testmask").Type("37");
+    setTimeout(function() {
+        $("#testmask").Type("12");
+        start();
+        equal($("#testmask").val(), "3712 ______ _____", "Result " + $("#testmask").val());
+
+        $("#testmask").remove();
+    }, 0);
+});
