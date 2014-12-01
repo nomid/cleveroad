@@ -117,6 +117,9 @@ class ProductController extends SiteController
     {
         $app = Yii::$app;
         $product = Product::loadProduct();
+        if($product->user_id != Yii::$app->user->id){
+            throw new ForbiddenHttpException();
+        }
         if($product->delete()){
             $app->session->setFlash('success', 'Product deleted');
         }
